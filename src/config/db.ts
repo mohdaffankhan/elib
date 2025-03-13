@@ -4,7 +4,7 @@ import { config } from "./config";
 const connectDB = async ()=>{
     try {
         mongoose.connection.on("connected", () => {
-            console.log("Database is connected");
+            console.log("Database is connected", mongoose.connection.host);
         })
     
         mongoose.connection.on("error", (err) => {

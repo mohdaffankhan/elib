@@ -2,6 +2,10 @@ import express from "express";
 
 const app = express();
 
+// middlewares
+app.use(express.json());
+
+// home
 app.get('/',(req, res)=>{
     res.json({message:"welcome to elib apis"})
 })
