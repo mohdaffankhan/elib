@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import createHttpError from "http-errors";
+import User from "./userModel";
 
 const registerUser = async (req:Request, res:Response, next:NextFunction) => {
     //validation
@@ -8,6 +9,14 @@ const registerUser = async (req:Request, res:Response, next:NextFunction) => {
         const error = createHttpError(400, "All fields are required");
         return next(error);
     }
+
+    const user = await User.findOne({email});
+    if(user) {
+        const error = createHttpError(400, "User already exists");
+        return next(error);
+    }
+
+    
 
     
     res.json({message:"user registered"});
