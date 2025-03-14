@@ -2,9 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import cloudinary from "../config/cloudinary";
 import path from "node:path";
 import createHttpError from "http-errors";
+import bookModel from "./bookModel";
+import fs from "fs";
 
 const registerBook = async (req:Request, res:Response, next:NextFunction) => {
     try {
+    const { title, genre } = req.body;
     const files = req.files as {[fieldname: string]: Express.Multer.File[]};
 
     // upload cover image
@@ -33,7 +36,26 @@ const registerBook = async (req:Request, res:Response, next:NextFunction) => {
      console.log(uploadBookFile);     
      console.log(uploadCoverImage);
      
-     res.json({message:"book registered"})
+
+     // add book in db
+     const newBook = await bookModel.create({
+        title,
+        author:"67d375c974f625d566fd8120",
+        genre,
+        coverImage: uploadCoverImage.secure_url,
+        file: uploadBookFile.secure_url
+     })
+     
+     // delete uploaded files
+     try {
+        await fs.promises.unlink(filepath);
+        await fs.promises.unlink(bookFilePath);
+     } catch (error) {
+        console.log("Error while deleting file", error);
+     }
+
+     
+     res.status(201).json(newBook._id );
    } catch (error) {
     console.log(error);
     return next(createHttpError(500, "Error while registering book"));
