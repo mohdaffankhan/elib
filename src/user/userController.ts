@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import createHttpError from "http-errors";
 import User from "./userModel";
 import bcrypt from "bcrypt";
+import { sign } from "jsonwebtoken";
+import { config } from "../config/config";
 
 const registerUser = async (req:Request, res:Response, next:NextFunction) => {
     //validation
@@ -19,9 +21,17 @@ const registerUser = async (req:Request, res:Response, next:NextFunction) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     
+    const newUser = await User.create({
+        name,
+        email,
+        password: hashedPassword
+    });
 
+    const token = sign({sub: newUser._id}, config.jwt_secret as string, {
+        expiresIn: "1d"
+    });
     
-    res.json({message:"user registered"});
+    res.json({accessToken: token});
 }
 
 export {registerUser}
