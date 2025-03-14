@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import createHttpError from "http-errors";
 import User from "./userModel";
+import bcrypt from "bcrypt";
 
 const registerUser = async (req:Request, res:Response, next:NextFunction) => {
     //validation
@@ -16,6 +17,7 @@ const registerUser = async (req:Request, res:Response, next:NextFunction) => {
         return next(error);
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
     
 
     
