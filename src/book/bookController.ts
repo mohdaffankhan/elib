@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { uploadonCloudinary } from "../config/cloudinary";
+import { deleteOnCloudinary, uploadonCloudinary } from "../config/cloudinary";
 import path from "node:path";
 import createHttpError from "http-errors";
 import bookModel from "./bookModel";
@@ -23,7 +23,10 @@ const registerBook = async (req:Request, res:Response, next:NextFunction) => {
 
     // upload book
      const bookFilePath = path.resolve(__dirname, `../../src/public/uploads/${bookFile.filename}`);
-     const book = await uploadonCloudinary(bookFilePath);
+     const book = await uploadonCloudinary(bookFilePath, {
+        resource_type: "raw",  // Ensures Cloudinary treats it as a file, not an image
+        format: "pdf", // Explicitly set the format to PDF
+      });
      
      console.log(book);     
      console.log(coverImage);
@@ -56,4 +59,8 @@ const registerBook = async (req:Request, res:Response, next:NextFunction) => {
    }
 }
 
-export {registerBook}
+function getPublicId(url: string) {
+    return url.split("/").pop()?.split(".")[0];
+}
+
+export {registerBook};

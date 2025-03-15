@@ -16,7 +16,7 @@ interface CloudinaryUploadResult {
 }
 
 // Function to upload a file to Cloudinary
-const uploadonCloudinary = async (localFilePath: string): Promise<CloudinaryUploadResult | null> => {
+const uploadonCloudinary = async (localFilePath: string, options={}): Promise<CloudinaryUploadResult | null> => {
   try {
     // Check if the file exists
     await fs.promises.access(localFilePath);
@@ -24,6 +24,7 @@ const uploadonCloudinary = async (localFilePath: string): Promise<CloudinaryUplo
     // Upload to Cloudinary
     const result = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "auto",
+      ...options,
     });
 
     console.log("File uploaded to Cloudinary. File URL:", result.url);
@@ -46,4 +47,16 @@ const uploadonCloudinary = async (localFilePath: string): Promise<CloudinaryUplo
   }
 };
 
-export { uploadonCloudinary };
+// Function to delete a file from Cloudinary
+const deleteOnCloudinary = async (publicId: string): Promise<boolean> => {
+    try {
+      await cloudinary.uploader.destroy(publicId);
+      console.log("File deleted from Cloudinary. PublicID:", publicId);
+      return true;
+    } catch (error) {
+      console.error("Error deleting file from Cloudinary:", error);
+      return false;
+    }
+  };
+
+export { uploadonCloudinary, deleteOnCloudinary };
