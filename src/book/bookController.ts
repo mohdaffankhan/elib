@@ -143,7 +143,6 @@ const updateBook = async (req:Request, res:Response, next:NextFunction) => {
 };
 
 const listBooks = async (req: Request, res: Response, next: NextFunction) => {
-    // const sleep = await new Promise((resolve) => setTimeout(resolve, 5000));
 
     try {
         // todo: add pagination.
@@ -155,5 +154,21 @@ const listBooks = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
+const getSingleBook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const book = await bookModel
+            .findById(req.params.bookId)
+            .populate({ path: "author", select: "name" });
 
-export {registerBook, updateBook, listBooks};
+        if (!book) {
+            return next(createHttpError(404, "Book not found."));
+        }
+
+        res.json(book);
+    } catch (err) {
+        console.error(err);
+        next(createHttpError(500, "Error while getting a book"));
+    }
+};
+
+export {registerBook, updateBook, listBooks, getSingleBook};
