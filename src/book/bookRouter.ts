@@ -1,5 +1,5 @@
 import express from "express";
-import { registerBook, updateBook } from "./bookController";
+import { registerBook, updateBook, listBooks } from "./bookController";
 import {upload} from "../config/multer";
 import { authenticate } from "../middlewares/authenticate";
 
@@ -20,5 +20,7 @@ bookRouter.patch("/:bookId",
     {name:"coverImage", maxCount:1},
     {name:"file", maxCount:1}
 ]), updateBook);
+
+bookRouter.get("/", listBooks);
 
 export default bookRouter;

@@ -142,4 +142,18 @@ const updateBook = async (req:Request, res:Response, next:NextFunction) => {
     }
 };
 
-export {registerBook, updateBook};
+const listBooks = async (req: Request, res: Response, next: NextFunction) => {
+    // const sleep = await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    try {
+        // todo: add pagination.
+        const book = await bookModel.find().populate("author", "name");
+        res.json(book);
+    } catch (err) {
+        console.log(err);
+        return next(createHttpError(500, "Error while getting a book"));
+    }
+};
+
+
+export {registerBook, updateBook, listBooks};
