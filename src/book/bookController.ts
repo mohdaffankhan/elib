@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import cloudinary from "../config/cloudinary";
+import { uploadonCloudinary } from "../config/cloudinary";
 import path from "node:path";
 import createHttpError from "http-errors";
 import bookModel from "./bookModel";
-import fs from "fs";
+import fs from "node:fs";
 import { authRequest } from "../middlewares/authenticate";
 
 const registerBook = async (req:Request, res:Response, next:NextFunction) => {
@@ -18,30 +18,15 @@ const registerBook = async (req:Request, res:Response, next:NextFunction) => {
     }
     
     // upload cover image
-    const coverImageMimeType = files?.coverImage[0].mimetype.split("/").at(-1);
-    const filename = files.coverImage[0].filename
-    const filepath = path.resolve(__dirname, `../../src/public/uploads/${filename}`);
-
-    const uploadCoverImage = await cloudinary.uploader.upload(filepath, {
-        filename_override: filename,
-        folder: "book-covers",
-        format: coverImageMimeType,
-    })
+    const filepath = path.resolve(__dirname, `../../src/public/uploads/${coverImageFile.filename}`);
+    const coverImage = await uploadonCloudinary(filepath);
 
     // upload book
-     const bookFileName = files?.file[0]?.filename;
-     const bookFilePath = path.resolve(__dirname, `../../src/public/uploads/${bookFileName}`);
-     const bookFileMimeType = files.file[0].mimetype.split("/").at(-1);
- 
-     const uploadBookFile = await cloudinary.uploader.upload(bookFilePath, {
-         filename_override: bookFileName,
-         resource_type: "raw",
-         folder: "book-pdfs",
-         format: bookFileMimeType,
-     })
+     const bookFilePath = path.resolve(__dirname, `../../src/public/uploads/${bookFile.filename}`);
+     const book = await uploadonCloudinary(bookFilePath);
      
-     console.log(uploadBookFile);     
-     console.log(uploadCoverImage);
+     console.log(book);     
+     console.log(coverImage);
       
      const _req = req as authRequest; // type assertion
      
@@ -51,8 +36,8 @@ const registerBook = async (req:Request, res:Response, next:NextFunction) => {
         title,
         author: _req.user,
         genre,
-        coverImage: uploadCoverImage.secure_url,
-        file: uploadBookFile.secure_url
+        coverImage: coverImage?.secure_url,
+        file: book?.secure_url
      })
      
      // delete uploaded files
