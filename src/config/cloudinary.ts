@@ -48,9 +48,11 @@ const uploadonCloudinary = async (localFilePath: string, options={}): Promise<Cl
 };
 
 // Function to delete a file from Cloudinary
-const deleteOnCloudinary = async (publicId: string): Promise<boolean> => {
+const deleteOnCloudinary = async (publicId: string, options={}): Promise<boolean> => {
     try {
-      await cloudinary.uploader.destroy(publicId);
+      await cloudinary.uploader.destroy(publicId, {
+        ...options
+      });
       console.log("File deleted from Cloudinary. PublicID:", publicId);
       return true;
     } catch (error) {
