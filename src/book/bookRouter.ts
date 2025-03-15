@@ -1,5 +1,5 @@
 import express from "express";
-import { registerBook } from "./bookController";
+import { registerBook, updateBook } from "./bookController";
 import {upload} from "../config/multer";
 import { authenticate } from "../middlewares/authenticate";
 
@@ -13,5 +13,12 @@ bookRouter.post("/register",
     {name:"coverImage", maxCount:1},
     {name:"file", maxCount:1}
 ]), registerBook);
+
+bookRouter.patch("/:bookId",
+    authenticate,
+    upload.fields([
+    {name:"coverImage", maxCount:1},
+    {name:"file", maxCount:1}
+]), updateBook);
 
 export default bookRouter;
