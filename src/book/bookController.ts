@@ -4,12 +4,19 @@ import path from "node:path";
 import createHttpError from "http-errors";
 import bookModel from "./bookModel";
 import fs from "fs";
+import { authRequest } from "../middlewares/authenticate";
 
 const registerBook = async (req:Request, res:Response, next:NextFunction) => {
     try {
     const { title, genre } = req.body;
     const files = req.files as {[fieldname: string]: Express.Multer.File[]};
-
+    const coverImageFile = files?.coverImage?.[0];
+    const bookFile = files?.file?.[0];
+    
+    if (!coverImageFile || !bookFile) {
+        return next(createHttpError(400, "Cover image and book file are required"));
+    }
+    
     // upload cover image
     const coverImageMimeType = files?.coverImage[0].mimetype.split("/").at(-1);
     const filename = files.coverImage[0].filename
@@ -35,12 +42,14 @@ const registerBook = async (req:Request, res:Response, next:NextFunction) => {
      
      console.log(uploadBookFile);     
      console.log(uploadCoverImage);
+      
+     const _req = req as authRequest; // type assertion
      
 
      // add book in db
      const newBook = await bookModel.create({
         title,
-        author:"67d375c974f625d566fd8120",
+        author: _req.user,
         genre,
         coverImage: uploadCoverImage.secure_url,
         file: uploadBookFile.secure_url
