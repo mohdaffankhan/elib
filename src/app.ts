@@ -1,16 +1,23 @@
 import express from "express";
-import cookieParser from "cookie-parser";
+import { config } from "./config/config";
+import cors from "cors";
 
 const app = express();
 
 // middlewares
 app.use(express.json());
-app.use(cookieParser());
+app.use(
+  cors({
+    origin: config.cors_origin,
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // home
-app.get('/',(req, res)=>{
-    res.json({message:"welcome to elib apis"})
-})
+app.get("/", (req, res) => {
+  res.json({ message: "welcome to elib apis" });
+});
 
 // routes
 import userRouter from "./user/userRouter";

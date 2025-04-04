@@ -21,8 +21,8 @@ const registerUser = async (req:Request, res:Response, next:NextFunction) => {
             return next(error);
         }
     } catch (error) {
-        return next(createHttpError(500, "Something went wrong"));
         console.error("Error while finding user: ", error);
+        return next(createHttpError(500, "Something went wrong"));
     }
 
     // create user
@@ -48,8 +48,8 @@ const registerUser = async (req:Request, res:Response, next:NextFunction) => {
         });
         res.status(201).json({accessToken: token});
     } catch (error) {
-        return next(createHttpError(500, "Error while signing jwt token"));
         console.error(error);
+        return next(createHttpError(500, "Error while signing jwt token"));
     }
 
 }
@@ -79,19 +79,15 @@ const loginUser = async (req:Request, res:Response, next:NextFunction) => {
             const token = sign({sub: user._id}, config.jwt_secret as string, {
                 expiresIn: "1d"
             });
-            const options = {
-                httpOnly: true, //cookie cannot be accessed by client side js
-                secure: process.env.NODE_ENV === "production", //if production then true else false
-              };
-            res.status(201).cookie("accessToken", token, options)
+            res.status(201).json({accessToken: token});
         } catch (error) {
-            return next(createHttpError(500, "Error while signing jwt token"));
             console.error(error);
+            return next(createHttpError(500, "Error while signing jwt token"));
         }
         res.json({message:"Login successful"});
     } catch (error) {
-      return next(createHttpError(500, "Something went wrong"));
       console.error("Error while finding user: ", error);  
+      return next(createHttpError(500, "Something went wrong"));
     }  
 }
 
