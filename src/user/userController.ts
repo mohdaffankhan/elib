@@ -79,12 +79,11 @@ const loginUser = async (req:Request, res:Response, next:NextFunction) => {
             const token = sign({sub: user._id}, config.jwt_secret as string, {
                 expiresIn: "1d"
             });
-            res.status(201).json({accessToken: token});
+            res.status(201).json({message:"Login successful", accessToken: token});
         } catch (error) {
             console.error(error);
             return next(createHttpError(500, "Error while signing jwt token"));
         }
-        res.json({message:"Login successful"});
     } catch (error) {
       console.error("Error while finding user: ", error);  
       return next(createHttpError(500, "Something went wrong"));
